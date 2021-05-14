@@ -1,6 +1,6 @@
 
 {
-	"name": ".NET 5 Container",
+	"name": ".NET 6 Container",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "workspace",
 	"workspaceFolder": "/workspace",
