@@ -1,0 +1,15 @@
+
+{
+	"name": ".NET 5 Container",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "workspace",
+	"workspaceFolder": "/workspace",
+	
+	"settings": {
+		"terminal.integrated.shell.linux": "/bin/bash"
+	},
+
+	"extensions": [],
+	
+	"remoteUser": "vscode"
+}
