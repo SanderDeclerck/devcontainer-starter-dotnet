@@ -1,5 +1,6 @@
 FROM mcr.microsoft.com/vscode/devcontainers/dotnet:5.0
 
+# Install Node
 RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && nvm install lts/* 2>&1"
 
 # Install Azure functions core tools
