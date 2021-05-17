@@ -1,28 +1,17 @@
-FROM mcr.microsoft.com/vscode/devcontainers/base:0-focal
+FROM mcr.microsoft.com/vscode/devcontainers/dotnet:5.0
 
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && nvm install lts/* 2>&1"
 
-USER vscode
+# Install Azure functions core tools
+WORKDIR /azure-func-install
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg && \
+  mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
+RUN sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-$(lsb_release -cs)-prod $(lsb_release -cs) main" > /etc/apt/sources.list.d/dotnetdev.list'
+RUN apt-get update && apt-get install azure-functions-core-tools-3
 
-# Install dotnet
-WORKDIR /dotnet-install
-RUN sudo wget https://packages.microsoft.com/config/ubuntu/20.10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
-    && sudo dpkg -i packages-microsoft-prod.deb
-
-RUN sudo apt-get update; \
-  sudo apt-get install -y apt-transport-https && \
-  sudo apt-get update && \
-  sudo apt-get install -y dotnet-sdk-5.0
-
-# Install node
-WORKDIR /node-install
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash \
-  && source ~/.bashrc \
-  && nvm install 14.15.1
-
-# Install yarn
-WORKDIR /yarn-install
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - \
-    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-RUN sudo apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && sudo apt-get -y install --no-install-recommends yarn
+# Install Azure CLI
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends ca-certificates curl apt-transport-https lsb-release gnupg
+RUN curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
+RUN AZ_REPO=$(lsb_release -cs) && echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | tee /etc/apt/sources.list.d/azure-cli.list
+RUN apt-get update && apt-get install azure-cli
